@@ -19,21 +19,28 @@
     <div id="result"></div>
 
     <script>
-        const dataUrl = 'https://raw.githubusercontent.com/SoLongAdele/GETC/main/data.json'; // Link đến file JSON
+        // Link tới file data.json
+        const dataUrl = './data.json';
 
+        // Lắng nghe sự kiện submit
         document.getElementById('lookup-form').addEventListener('submit', async (event) => {
             event.preventDefault();
+
+            // Lấy giá trị từ form
             const customerId = document.getElementById('customer_id').value;
             const date = document.getElementById('date').value;
 
             try {
+                // Tải dữ liệu từ file JSON
                 const response = await fetch(dataUrl);
                 const data = await response.json();
 
+                // Tìm dữ liệu khớp với mã khách hàng và ngày
                 const result = data.find(
                     entry => entry.customer_id === customerId && entry.date === date
                 );
 
+                // Hiển thị kết quả
                 const resultDiv = document.getElementById('result');
                 if (result) {
                     resultDiv.innerHTML = `<p>Chỉ số công tơ: ${result.meter_value}</p>`;
@@ -42,7 +49,7 @@
                 }
             } catch (error) {
                 console.error(error);
-                document.getElementById('result').innerHTML = '<p>Không thể kết nối tới dữ liệu.</p>';
+                document.getElementById('result').innerHTML = '<p>Không thể tải dữ liệu.</p>';
             }
         });
     </script>
