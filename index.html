@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu chỉ số công tơ</title>
+</head>
+<body>
+    <h1>Tra cứu chỉ số công tơ</h1>
+    <form id="lookup-form">
+        <label for="customer_id">Mã khách hàng:</label>
+        <input type="text" id="customer_id" placeholder="Ví dụ: KH001" required>
+        <br><br>
+        <label for="date">Ngày:</label>
+        <input type="date" id="date" required>
+        <br><br>
+        <button type="submit">Tra cứu</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        const dataUrl = 'https://raw.githubusercontent.com/SoLongAdele/GETC/main/data.json'; // Link đến file JSON
+
+        document.getElementById('lookup-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const customerId = document.getElementById('customer_id').value;
+            const date = document.getElementById('date').value;
+
+            try {
+                const response = await fetch(dataUrl);
+                const data = await response.json();
+
+                const result = data.find(
+                    entry => entry.customer_id === customerId && entry.date === date
+                );
+
+                const resultDiv = document.getElementById('result');
+                if (result) {
+                    resultDiv.innerHTML = `<p>Chỉ số công tơ: ${result.meter_value}</p>`;
+                } else {
+                    resultDiv.innerHTML = `<p>Không tìm thấy dữ liệu cho mã khách hàng ${customerId} vào ngày ${date}.</p>`;
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('result').innerHTML = '<p>Không thể kết nối tới dữ liệu.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
