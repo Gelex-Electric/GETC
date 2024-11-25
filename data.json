@@ -1,0 +1,4 @@
+[
+  { "customer_id": "KH001", "date": "2024-11-01", "meter_value": 120 },
+  { "customer_id": "KH002", "date": "2024-11-01", "meter_value": 85 }
+]
