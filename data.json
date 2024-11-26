@@ -1,5 +1,18 @@
 [
-  { "customer_id": "KH001", "date": "2024-11-01", "meter_value": 120 },
-  { "customer_id": "KH002", "date": "2024-11-01", "meter_value": 85 },
-  { "customer_id": "KH001", "date": "2024-11-02", "meter_value": 130 }
+    {
+        "month": "January",
+        "sales": 500
+    },
+    {
+        "month": "February",
+        "sales": 700
+    },
+    {
+        "month": "March",
+        "sales": 600
+    },
+    {
+        "month": "April",
+        "sales": 800
+    }
 ]
