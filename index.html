@@ -3,55 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tra cứu chỉ số công tơ</title>
+    <title>Bar Chart Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        canvas {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
-    <h1>Tra cứu chỉ số công tơ</h1>
-    <form id="lookup-form">
-        <label for="customer_id">Mã khách hàng:</label>
-        <input type="text" id="customer_id" placeholder="Ví dụ: KH001" required>
-        <br><br>
-        <label for="date">Ngày:</label>
-        <input type="date" id="date" required>
-        <br><br>
-        <button type="submit">Tra cứu</button>
-    </form>
-    <div id="result"></div>
+    <h1>Monthly Sales</h1>
+    <canvas id="myChart"></canvas>
 
     <script>
-        // Link tới file data.json
-        const dataUrl = './data.json';
+        // Fetch data from JSON file
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                // Extract labels and values from the JSON data
+                const labels = data.map(item => item.month);
+                const values = data.map(item => item.sales);
 
-        // Lắng nghe sự kiện submit
-        document.getElementById('lookup-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            // Lấy giá trị từ form
-            const customerId = document.getElementById('customer_id').value;
-            const date = document.getElementById('date').value;
-
-            try {
-                // Tải dữ liệu từ file JSON
-                const response = await fetch(dataUrl);
-                const data = await response.json();
-
-                // Tìm dữ liệu khớp với mã khách hàng và ngày
-                const result = data.find(
-                    entry => entry.customer_id === customerId && entry.date === date
-                );
-
-                // Hiển thị kết quả
-                const resultDiv = document.getElementById('result');
-                if (result) {
-                    resultDiv.innerHTML = `<p>Chỉ số công tơ: ${result.meter_value}</p>`;
-                } else {
-                    resultDiv.innerHTML = `<p>Không tìm thấy dữ liệu cho mã khách hàng ${customerId} vào ngày ${date}.</p>`;
-                }
-            } catch (error) {
-                console.error(error);
-                document.getElementById('result').innerHTML = '<p>Không thể tải dữ liệu.</p>';
-            }
-        });
+                // Create the chart
+                const ctx = document.getElementById('myChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar', // Bar chart
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Sales ($)',
+                            data: values,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error loading JSON:', error);
+            });
     </script>
 </body>
 </html>
