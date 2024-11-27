@@ -3,60 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bar Chart Example</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-        }
-        canvas {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-    </style>
+    <title>Trang Ví dụ</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Monthly Sales</h1>
-    <canvas id="myChart"></canvas>
-
-    <script>
-        // Fetch data from JSON file
-        fetch('data.json')
-            .then(response => response.json())
-            .then(data => {
-                // Extract labels and values from the JSON data
-                const labels = data.map(item => item.month);
-                const values = data.map(item => item.sales);
-
-                // Create the chart
-                const ctx = document.getElementById('myChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar', // Bar chart
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Sales ($)',
-                            data: values,
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Error loading JSON:', error);
-            });
-    </script>
+    <h1>Chào mừng!</h1>
+    <p>Đây là một ví dụ sử dụng tệp tin CSS.</p>
 </body>
 </html>
