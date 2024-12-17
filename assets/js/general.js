@@ -1,7 +1,7 @@
 
 function fetchAndProcessCSV() {
 
-    fetch('./assets/js/general.csv')
+    fetch('./assets/data/general.csv')
         .then(response => response.text())
         .then(text => {
             Papa.parse(text, {
