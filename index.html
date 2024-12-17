@@ -1,23 +1,124 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biểu Đồ Phụ Tải Điện từ CSV</title>
-    <link rel="stylesheet" href="styles/styles.css">
+    <title>Báo cáo kinh doanh điện GETC</title>
+    <!--Favicon-->
+    <link rel="shortcut icon" href="./assets/logo/favicon.ico" type="image/x-icon">
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="./assets/css/app.css">
 </head>
+
 <body>
-    <header>
-        <h1>Biểu Đồ Phụ Tải Điện từ CSV</h1>
-    </header>
+    
+    <div id="app">
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <div class="sidebar-wrapper active">
+                <!-- Sidebar Header -->
+                <div class="sidebar-header position-relative">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Logo Placeholder -->
+                        <div class="logo">
+                            <a href="index.html">
+                                <img src="/assets/logo/LOGO.svg" alt="GETC Company Logo" class="img-fluid">
+                            </a>
+                        </div>
+                        <!-- Sidebar Toggler -->
+                        <div class="sidebar-toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block">
+                                <i class="bi bi-x bi-middle"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Sidebar Links -->
+                <nav class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+                        <li class="sidebar-item active">
+                            <a href="index.html" class="sidebar-link">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>      
+            </div>
+        </div>
+    </div>
+    
+        <!-- Main Content -->
+        <main>
 
-    <section>
-        <input type="file" id="fileInput" accept=".csv">
-        <canvas id="loadChart" width="800" height="400"></canvas>
-    </section>
+            <div id="main">
+                <header class="mb-3">
+                    <a href="#" class="burger-btn d-block d-xl-none">
+                        <i class="bi bi-justify fs-3"></i>
+                    </a>
+                </header>
+                
+                 <section class="section">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6>Sản lượng mua</h6>
+                                    <span id="totalPurchaseVolume" class="bold-value">Đang tải...</span>                                   
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6>Sản lượng bán</h6>
+                                    <span id="totalSaleVolume" class="bold-value">Đang tải...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6>Tiền mua điện</h6>
+                                    <span id="totalPurchaseAmount" class="bold-value">Đang tải...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6>Tiền bán điện</h6>
+                                    <span id="totalSaleAmount" class="bold-value">Đang tải...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class=".col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <canvas id="barChart" style="width: 100%; height: 400px;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-    <script src="scripts/papaparse.min.js"></script>
-    <script src="scripts/Chart.min.js"></script>
-    <script src="scripts/script.js"></script>
+                <footer>
+
+                </footer>
+            
+            </div>
+
+
+        </main>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="./assets/js/chart1.js"></script>
+    <script src="./assets/js/general.js"></script>
 </body>
 </html>
