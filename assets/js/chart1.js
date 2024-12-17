@@ -25,7 +25,7 @@ const displayValuePlugin = {
 
 // Load CSV and render chart
 document.addEventListener("DOMContentLoaded", function () {
-    fetch('./assets/js/chart1.csv')
+    fetch('./assets/data/chart1.csv')
         .then(response => response.text())
         .then(csvText => {
             Papa.parse(csvText, {
