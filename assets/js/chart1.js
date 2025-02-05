@@ -1,71 +1,60 @@
-// Plugin
-const displayValuePlugin = {
-    id: 'displayValuePlugin',
-    afterDatasetsDraw(chart) {
-        const { ctx } = chart;
-        chart.data.datasets.forEach((dataset, i) => {
-            const meta = chart.getDatasetMeta(i);
-            if (meta.hidden) {
-                return;
-            }
-
-            meta.data.forEach((bar, index) => {
-                const value = dataset.data[index];
-                if (value !== null && value !== undefined) {
-                    const formattedValue = new Intl.NumberFormat('vi-VN').format(value); // ###.###
-                    ctx.fillStyle = 'black'; 
-                    ctx.font = '12px Arial'; 
-                    ctx.textAlign = 'center';
-                    ctx.fillText(formattedValue, bar.x, bar.y - 5);
-                }
-            });
-        });
-    }
-};
-
-// Load CSV and render chart
 document.addEventListener("DOMContentLoaded", function () {
-    fetch('./assets/data/chart1.csv')
-        .then(response => response.text())
-        .then(csvText => {
-            Papa.parse(csvText, {
-                header: true, // Parse CSV with headers
-                skipEmptyLines: true,
-                complete: function (results) {
-                    const data = results.data;
-                    renderChart(data);
-                }
-            });
-        });
+    fetchAndProcessCSV('/assets/data/datahd.csv', displayResults);
+    fetchAndProcessCSV('/assets/data/datahd.csv', displaychart);
 });
 
-// Function to render chart using Chart.js
-function renderChart(data) {
-    // Extract labels (months) and values (load) from CSV
-    const labels = data.map(row => row['Tháng']); // Replace 'Month' with your CSV column name
-    const values2023 = data.map(row => parseFloat(row['2023']));
-    const values2024 = data.map(row => parseFloat(row['2024']));
+function displaychart(data) {
+    const monthslabels = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
+    const values2023 = Array(12).fill(0); 
+    const values2024 = Array(12).fill(0);
+    const values2025 = Array(12).fill(0);
 
-    // Chart.js configuration
+    data.forEach(row => {
+        const date = row['Ngày'];
+        const tongSL = parseFloat(row['Tổng SL']) || 0;
+        const [day, month, year] = date.split('/');
+        const monthIndex = parseInt(month, 10) - 1; 
+
+        if (tongSL > 0) {
+           if (year === '2023') {
+            values2023[monthIndex] += tongSL;
+            }
+            if (year === '2024') {
+            values2024[monthIndex] += tongSL;
+            } 
+            if (year === '2025') {
+            values2025[monthIndex] += tongSL;
+            } 
+        }
+        
+    });
+
+    // render Chart.js
     const ctx = document.getElementById('barChart').getContext('2d');
     new Chart(ctx, {
+        type: 'bar',
         data: {
-            labels: labels,
+            labels: monthslabels,
             datasets: [
                 {
-                    type: 'bar',
                     label: 'Năm 2023',
                     data: values2023,
-                    backgroundColor: 'rgba(0, 105, 148, 0.6)', // Bar background color
-                    borderColor: 'rgba(0, 105, 148, 1)', // Bar border color
+                    backgroundColor: 'rgba(0, 105, 148, 0.6)',
+                    borderColor: 'rgba(0, 105, 148, 1)',
                     borderWidth: 1
                 },
                 {
-                    type: 'bar',
                     label: 'Năm 2024',
                     data: values2024,
-                    backgroundColor: 'rgba(255, 165, 0, 0.6)', // Bar background color
-                    borderColor: 'rgba(255, 165, 0, 1)', // Bar border color
+                    backgroundColor: 'rgba(255, 165, 0, 0.6)',
+                    borderColor: 'rgba(255, 165, 0, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Năm 2025',
+                    data: values2025,
+                    backgroundColor: 'rgba(255, 0, 0, 0.6)',
+                    borderColor: 'rgb(255, 0, 106)',
                     borderWidth: 1
                 }
             ]
@@ -78,15 +67,15 @@ function renderChart(data) {
                     display: true,
                     text: 'Biểu đồ phụ tải năm',
                     font: {
-                        size: 20 // Increase font size of title
+                        size: 20
                     }
                 },
                 tooltip: {
                     callbacks: {
-                        label: function(tooltipItem) {
+                        label: function (tooltipItem) {
                             const value = tooltipItem.raw;
-                            const formattedValue = new Intl.NumberFormat('vi-VN').format(value); // Định dạng số ###.###
-                            return `${tooltipItem.dataset.label}: ${formattedValue} kWh`; // Hiển thị thêm đơn vị
+                            const formattedValue = new Intl.NumberFormat('vi-VN').format(value);
+                            return `${tooltipItem.dataset.label}: ${formattedValue} kWh`;
                         }
                     }
                 }
@@ -103,4 +92,40 @@ function renderChart(data) {
         },
         plugins: [displayValuePlugin]
     });
+}
+
+function formatNumber(value, unit) {
+    const formatted = value.toLocaleString('vi-VN');
+    return `${formatted} ${unit}`;
+}
+
+function displayResults(data) {
+    let totalPositiveSL = 0;
+    let totalNegativeSL = 0;
+    let totalPositiveTD = 0;
+    let totalNegativeTD = 0;
+  
+    data.forEach(row => {
+      const tongSL = parseFloat(row['Tổng SL']) || 0;
+      const tienDien = parseFloat(row['Tiền trước thuế']) || 0;
+      // Process SL
+      if (tongSL > 0) {
+        totalPositiveSL += tongSL;
+      } else {
+        totalNegativeSL += Math.abs(tongSL);
+      }
+  
+      // Process Tiendien
+      if (tienDien > 0) {
+        totalPositiveTD += tienDien;
+      } else {
+        totalNegativeTD += Math.abs(tienDien);
+      }
+  
+    });
+  
+    document.getElementById("totalPurchaseVolume").innerHTML = `<b>${formatNumber(totalNegativeSL, 'kWh')}</b>`;
+    document.getElementById("totalSaleVolume").innerHTML = `<b>${formatNumber(totalPositiveSL, 'kWh')}</b>`;
+    document.getElementById("totalPurchaseAmount").innerHTML = `<b>${formatNumber(totalPositiveTD, 'đồng')}</b>`;
+    document.getElementById("totalSaleAmount").innerHTML = `<b>${formatNumber(totalNegativeTD, 'đồng')}</b>`;
 }
