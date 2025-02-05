@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
-    fetchAndProcessCSV('/assets/data/datahd.csv', displayResults);
-    fetchAndProcessCSV('/assets/data/datahd.csv', displaychart);
+    fetchAndProcessCSV('./assets/data/datahd.csv', displayResults);
+    fetchAndProcessCSV('./assets/data/datahd.csv', displaychart);
 });
 
 function displaychart(data) {
