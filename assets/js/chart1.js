@@ -94,11 +94,6 @@ function displaychart(data) {
     });
 }
 
-function formatNumber(value, unit) {
-    const formatted = value.toLocaleString('vi-VN');
-    return `${formatted} ${unit}`;
-}
-
 function displayResults(data) {
     let totalPositiveSL = 0;
     let totalNegativeSL = 0;
@@ -124,8 +119,8 @@ function displayResults(data) {
   
     });
   
-    document.getElementById("totalPurchaseVolume").innerHTML = `<b>${formatNumber(totalNegativeSL, 'kWh')}</b>`;
-    document.getElementById("totalSaleVolume").innerHTML = `<b>${formatNumber(totalPositiveSL, 'kWh')}</b>`;
-    document.getElementById("totalPurchaseAmount").innerHTML = `<b>${formatNumber(totalPositiveTD, 'đồng')}</b>`;
-    document.getElementById("totalSaleAmount").innerHTML = `<b>${formatNumber(totalNegativeTD, 'đồng')}</b>`;
+    document.getElementById("totalPurchaseVolume").innerHTML = `<b>${formatCurrency(totalNegativeSL, 'kWh')}</b>`;
+    document.getElementById("totalSaleVolume").innerHTML = `<b>${formatCurrency(totalPositiveSL, 'kWh')}</b>`;
+    document.getElementById("totalPurchaseAmount").innerHTML = `<b>${formatCurrency(totalPositiveTD, 'đồng')}</b>`;
+    document.getElementById("totalSaleAmount").innerHTML = `<b>${formatCurrency(totalNegativeTD, 'đồng')}</b>`;
 }
