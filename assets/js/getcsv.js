@@ -1,3 +1,7 @@
+// Function
+/**
+Hàm parse CSV
+ */
 function fetchAndProcessCSV(filePath, callback) {
     fetch(filePath)
         .then(response => {
@@ -20,6 +24,31 @@ function fetchAndProcessCSV(filePath, callback) {
         })
         .catch(error => console.error("Error loading CSV:", error));
 }
+/**
+ * Định dạng số "###.### "
+ */
+function formatCurrency(value, unit) {
+    const num = parseFloat(value) || 0;
+    return num.toLocaleString('vi-VN') + unit;
+  }
+  /**
+  * format dd/mm/yyyy -> Date
+  */
+function parseDateDMY(dateStr) {
+    const [day, month, year] = dateStr.split('/');
+    return new Date(year, month - 1, day);
+  }
+  /**
+  * Format Date -> dd/mm/yyyy
+  */
+function formatDateDMY(date) {
+    const day = ('0' + date.getDate()).slice(-2);
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
+  
 // Plugin
 const displayValuePlugin = {
     id: 'displayValuePlugin',
