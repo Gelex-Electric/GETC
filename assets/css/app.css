@@ -19275,6 +19275,9 @@ body .bi:before,
 .stats-icon.green {
   background-color: #5ddab4;
 }
+.stats-icon.yellow {
+  background-color: #f2f545;
+}
 @media (max-width: 767px) {
   .stats-icon {
     float: left;
