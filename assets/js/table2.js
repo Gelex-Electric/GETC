@@ -16,17 +16,17 @@ function processData(data) {
   const groups03 = {};   // cho mã bắt đầu bằng "KCN03"
 
   data.forEach(r => {
-    const mkh = r.MKH;
-    if (mkh.startsWith("KCNTH")) {
+    const mkh = r["Tên Tắt"];
+    if (mkh.startsWith("TH")) {
       if (!groupsTH[mkh]) groupsTH[mkh] = [];
       groupsTH[mkh].push(r);
-    } else if (mkh.startsWith("KCNPĐ")) {
+    } else if (mkh.startsWith("PĐ")) {
       if (!groupsPD[mkh]) groupsPD[mkh] = [];
       groupsPD[mkh].push(r);
-    } else if (mkh.startsWith("KCNYM")) {
+    } else if (mkh.startsWith("YM")) {
       if (!groupsYM[mkh]) groupsYM[mkh] = [];
       groupsYM[mkh].push(r);
-    } else if (mkh.startsWith("KCN03")) {
+    } else if (mkh.startsWith("03")) {
       if (!groups03[mkh]) groups03[mkh] = [];
       groups03[mkh].push(r);
     }
@@ -57,9 +57,8 @@ function buildTableHTML(groups, tableId) {
     });
   }
 
-  // Tạo mảng 10 ngày liên tiếp: từ globalLatestDate đến globalLatestDate + 9
   const dayList = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 15; i++) {
     const d = new Date(globalLatestDate);
     d.setDate(d.getDate() + i);
     dayList.push(d);
@@ -110,7 +109,7 @@ function buildTableHTML(groups, tableId) {
     // Duyệt qua từng ô của dayList (các cột ngày)
     dayList.forEach((d, i) => {
       // Khởi tạo style cơ bản cho ô: padding và đường phân cách giữa các cột
-      let cellStyle = "padding:5px; border-right:1px solid #ccc;";
+      let cellStyle = "padding:5px; border-right:2px solid #ccc;";
       
       if (rowHasPayment) {
         // Nếu dòng có thanh toán, kiểm tra xem ô này có thanh toán hay không
