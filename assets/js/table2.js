@@ -83,12 +83,10 @@ function buildTableHTML(groups, tableId) {
   html += '<tbody>';
   for (let mkh in groups) {
     const records = groups[mkh];
-    // Lấy số tiền thanh toán từ bản ghi có "Ngày" = globalLatestDate
-    const rowFound = records.find(r => r.creationDateObj.getTime() === globalLatestDate.getTime());
-    let numericPayment = 0;
-    if (rowFound) {
-      numericPayment = parseFloat(rowFound['Tiền sau thuế']) || 0;
-    }
+    // Lọc các bản ghi có creationDateObj bằng globalLatestDate và cộng dồn giá trị 'Tiền sau thuế'
+    const matchingRows = records.filter(r => r.creationDateObj.getTime() === globalLatestDate.getTime());
+    let numericPayment = matchingRows.reduce((sum, r) => sum + (parseFloat(r['Tiền sau thuế']) || 0), 0);
+
     // Bỏ qua dòng nếu số tiền thanh toán bằng 0
     if (numericPayment === 0) continue;
 
@@ -110,7 +108,7 @@ function buildTableHTML(groups, tableId) {
     dayList.forEach((d, i) => {
       // Khởi tạo style cơ bản cho ô: padding và đường phân cách giữa các cột
       let cellStyle = "padding:5px; border-right:2px solid #ccc;";
-      
+
       if (rowHasPayment) {
         // Nếu dòng có thanh toán, kiểm tra xem ô này có thanh toán hay không
         const hasPayment = records.some(r => formatDateDMY(r.paymentDateObj) === formatDateDMY(d));
@@ -164,4 +162,5 @@ function buildTableHTML(groups, tableId) {
     });
   });
 }
+
 
