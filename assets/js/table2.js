@@ -93,9 +93,10 @@ function buildTableHTML(groups, tableId) {
     totalPayment += numericPayment;
     const paymentValue = formatCurrency(numericPayment, "");
 
-    // Kiểm tra xem dòng có chứa ít nhất 1 ô "Thanh toán" hay không
+    // Lọc các bản ghi có creationDateObj bằng globalLatestDate để kiểm tra thanh toán
+    const latestRecords = records.filter(r => r.creationDateObj.getTime() === globalLatestDate.getTime());
     const rowHasPayment = dayList.some(d =>
-      records.some(r => formatDateDMY(r.paymentDateObj) === formatDateDMY(d))
+      latestRecords.some(r => formatDateDMY(r.paymentDateObj) === formatDateDMY(d))
     );
 
     // Nếu dòng có thanh toán: toàn dòng nền lightgreen, chữ màu xanh
@@ -106,12 +107,11 @@ function buildTableHTML(groups, tableId) {
 
     // Duyệt qua từng ô của dayList (các cột ngày)
     dayList.forEach((d, i) => {
-      // Khởi tạo style cơ bản cho ô: padding và đường phân cách giữa các cột
       let cellStyle = "padding:5px; border-right:2px solid #ccc;";
 
       if (rowHasPayment) {
-        // Nếu dòng có thanh toán, kiểm tra xem ô này có thanh toán hay không
-        const hasPayment = records.some(r => formatDateDMY(r.paymentDateObj) === formatDateDMY(d));
+        // Chỉ kiểm tra thanh toán trong các bản ghi có creationDateObj bằng globalLatestDate
+        const hasPayment = latestRecords.some(r => formatDateDMY(r.paymentDateObj) === formatDateDMY(d));
         html += `<td style="${cellStyle}">${hasPayment ? "<strong>Thanh toán</strong>" : ""}</td>`;
       } else {
         if (i === 0) {
@@ -162,5 +162,3 @@ function buildTableHTML(groups, tableId) {
     });
   });
 }
-
-
