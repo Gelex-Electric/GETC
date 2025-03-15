@@ -71,3 +71,42 @@ const displayValuePlugin = {
         });
     }
 };
+
+const stackedValuePlugin = {
+    id: 'stackedValuePlugin',
+    afterDatasetsDraw: function(chart, easing) {
+        const ctx = chart.ctx;
+        const metaDatasets = chart.data.datasets.map((ds, idx) => chart.getDatasetMeta(idx));
+        // Duyệt qua từng cột (mỗi nhãn trục x)
+        chart.data.labels.forEach((label, i) => {
+            // Tính tổng sản lượng của các dataset đang hiển thị cho cột đó
+            let total = 0;
+            metaDatasets.forEach((meta, idx) => {
+                if (!meta.hidden) {
+                    const value = chart.data.datasets[idx].data[i] || 0;
+                    total += value;
+                }
+            });
+            // Vẽ label cho từng stack nếu giá trị >= 10% tổng của cột
+            metaDatasets.forEach((meta, idx) => {
+                if (!meta.hidden) {
+                    const value = chart.data.datasets[idx].data[i] || 0;
+                    if (total > 0 && value >= 0.1 * total) {
+                        const element = meta.data[i];
+                        // Tính vị trí vẽ label: ở giữa phần stack
+                        const centerX = element.x;
+                        // Lấy vị trí trung bình theo chiều dọc của segment
+                        const centerY = element.y + element.height / 2;
+                        ctx.save();
+                        ctx.fillStyle = 'black';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.font = '12px sans-serif';
+                        ctx.fillText(new Intl.NumberFormat('vi-VN').format(value), centerX, centerY);
+                        ctx.restore();
+                    }
+                }
+            });
+        });
+    }
+};
