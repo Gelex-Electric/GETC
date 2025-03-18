@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
     fetchAndProcessCSV('../assets/data/datahd.csv', function(data) {
+        // Lưu dữ liệu gốc vào biến toàn cục
+        window.originalData = data;
         // Vẽ biểu đồ bán hàng theo tháng cho các MKH có tiền tố xác định
         displayChartsByMKH(data);
-        // Cập nhật kết quả tổng hợp (bán theo tiền tố và mua theo mapping EVN)
+        // Cập nhật kết quả tổng hợp (sale và purchase)
         displayResults(data);
     });
 });
@@ -101,6 +103,47 @@ function displayChartsByMKH(data) {
                                     return `${dataset.label}: Sản lượng: ${formattedVolume} kWh, Tiền điện: ${formattedAmount} đồng`;
                                 }
                             }
+                        },
+                        legend: {
+                            onClick: function(e, legendItem, legend) {
+                                const chart = legend.chart;
+                                const index = legendItem.datasetIndex;
+                                const meta = chart.getDatasetMeta(index);
+                                // Toggle trạng thái ẩn/hiện của dataset
+                                meta.hidden = meta.hidden === null ? !chart.data.datasets[index].hidden : null;
+                                chart.update();
+
+                                // Lấy danh sách năm đang hiển thị (loại bỏ "Năm " nếu có)
+                                const visibleYears = chart.data.datasets
+                                    .filter((dataset, idx) => chart.isDatasetVisible(idx))
+                                    .map(dataset => dataset.label.replace('Năm ', ''));
+
+                                // Tính tổng sản lượng và tiền điện từ các dataset đang hiển thị (cho phần sale)
+                                let totalVolume = 0;
+                                let totalAmount = 0;
+                                chart.data.datasets.forEach((dataset, i) => {
+                                    if (chart.isDatasetVisible(i)) {
+                                        totalVolume += dataset.data.reduce((acc, curr) => acc + curr, 0);
+                                        totalAmount += dataset.amountData.reduce((acc, curr) => acc + curr, 0);
+                                    }
+                                });
+
+                                // Cập nhật DOM cho phần sale của tiền tố hiện tại
+                                const saleVolumeElem = document.getElementById("totalVolume_" + prefix);
+                                const saleAmountElem = document.getElementById("totalAmount_" + prefix);
+                                if (saleVolumeElem) {
+                                    saleVolumeElem.innerHTML = `<b>${formatCurrency(totalVolume, 'kWh')}</b>`;
+                                }
+                                if (saleAmountElem) {
+                                    saleAmountElem.innerHTML = `<b>${formatCurrency(totalAmount, 'đồng')}</b>`;
+                                }
+
+                                // Cập nhật lại phần purchase bằng cách gọi displayResults với bộ lọc visibleYears
+                                // Giả sử dữ liệu gốc được lưu trong window.originalData
+                                if (window.originalData) {
+                                    displayResults(window.originalData, visibleYears);
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -116,65 +159,60 @@ function displayChartsByMKH(data) {
     });
 }
 
-function displayResults(data) {
-    // Mảng chứa 4 tiền tố cần xử lý cho bán hàng
+function displayResults(data, visibleYears) {
+    // Mảng chứa tiền tố bán và mã EVN mua (riêng biệt, không liên hệ theo index)
     const salePrefixes = ["KCNTH", "KCNPĐ", "KCN03", "KCNYM"];
+    const purchasePrefixes = ["EVN-TH", "EVN-PĐ", "EVN-YM", "EVN-03"];
+
     let saleResults = {};
+    let purchaseResults = {};
+    
     salePrefixes.forEach(prefix => {
         saleResults[prefix] = { volume: 0, amount: 0 };
     });
+    purchasePrefixes.forEach(prefix => {
+        purchaseResults[prefix] = { volume: 0, amount: 0 };
+    });
 
-    // Tính tổng bán: đối với dòng có MKH bắt đầu bằng một trong các tiền tố và Tổng SL > 0
     data.forEach(row => {
-        const mkh = row['MKH'];
-        if (mkh && salePrefixes.some(prefix => mkh.startsWith(prefix))) {
-            const tongSL = parseFloat(row['Tổng SL']) || 0;
-            const tienDien = parseFloat(row['Tiền trước thuế']) || 0;
-            if (tongSL > 0) {
-                for (let prefix of salePrefixes) {
-                    if (mkh.startsWith(prefix)) {
-                        saleResults[prefix].volume += tongSL;
-                        saleResults[prefix].amount += tienDien;
-                        break;
+        // Nếu có bộ lọc năm được bật, lấy năm từ ngày (giả sử định dạng "dd/mm/yyyy")
+        if (visibleYears && visibleYears.length > 0) {
+            const dateStr = row['Ngày'];
+            if (dateStr) {
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    const year = parts[2];
+                    if (!visibleYears.includes(year)) {
+                        return; // bỏ qua dòng không thuộc năm đang bật
                     }
                 }
             }
         }
-    });
-
-    // Phần mua hàng: chỉ nhóm các dòng có MKH nằm trong 4 tiền tố theo mapping EVN
-    const purchaseMapping = {
-        "KCNTH": "EVN-TH",
-        "KCNPĐ": "EVN-PĐ",
-        "KCN03": "EVN-AT",
-        "KCNYM": "EVN-YM"
-    };
-    let purchaseResults = {};
-    Object.values(purchaseMapping).forEach(mapped => {
-        purchaseResults[mapped] = { volume: 0, amount: 0 };
-    });
-    data.forEach(row => {
         const mkh = row['MKH'];
         if (mkh) {
-            for (let prefix of salePrefixes) {
-                if (mkh.startsWith(prefix)) {
-                    const tongSL = parseFloat(row['Tổng SL']) || 0;
-                    const tienDien = parseFloat(row['Tiền trước thuế']) || 0;
-                    if (tongSL < 0) { // mua hàng
-                        const mapped = purchaseMapping[prefix];
-                        purchaseResults[mapped].volume += Math.abs(tongSL);
-                        purchaseResults[mapped].amount += Math.abs(tienDien);
-                    }
-                    break;
+            const tongSL = parseFloat(row['Tổng SL']) || 0;
+            const tienDien = parseFloat(row['Tiền trước thuế']) || 0;
+            // Giao dịch bán: salePrefixes (Tổng SL > 0)
+            salePrefixes.forEach(prefix => {
+                if (mkh.startsWith(prefix) && tongSL > 0) {
+                    saleResults[prefix].volume += tongSL;
+                    saleResults[prefix].amount += tienDien;
                 }
-            }
+            });
+            // Giao dịch mua: purchasePrefixes (Tổng SL < 0)
+            purchasePrefixes.forEach(prefix => {
+                if (mkh.startsWith(prefix) && tongSL < 0) {
+                    purchaseResults[prefix].volume += tongSL;
+                    purchaseResults[prefix].amount += tienDien;
+                }
+            });
         }
     });
 
-    // Cập nhật DOM cho bán hàng: với mỗi tiền tố, cập nhật các id "totalSaleVolume_<prefix>" và "totalSaleAmount_<prefix>"
+    // Cập nhật DOM cho bán hàng (sale)
     salePrefixes.forEach(prefix => {
-        const volumeElem = document.getElementById("totalSaleVolume_" + prefix);
-        const amountElem = document.getElementById("totalSaleAmount_" + prefix);
+        const volumeElem = document.getElementById("totalVolume_" + prefix);
+        const amountElem = document.getElementById("totalAmount_" + prefix);
         if (volumeElem) {
             volumeElem.innerHTML = `<b>${formatCurrency(saleResults[prefix].volume, 'kWh')}</b>`;
         }
@@ -183,15 +221,15 @@ function displayResults(data) {
         }
     });
 
-    // Cập nhật DOM cho mua hàng: với mỗi EVN theo mapping, cập nhật các id "totalSaleVolume_<EVN>" và "totalSaleAmount_<EVN>"
-    Object.keys(purchaseResults).forEach(mapped => {
-        const volumeElem = document.getElementById("totalSaleVolume_" + mapped);
-        const amountElem = document.getElementById("totalSaleAmount_" + mapped);
+    // Cập nhật DOM cho mua hàng (purchase) - hiển thị giá trị tuyệt đối
+    purchasePrefixes.forEach(prefix => {
+        const volumeElem = document.getElementById("totalVolume_" + prefix);
+        const amountElem = document.getElementById("totalAmount_" + prefix);
         if (volumeElem) {
-            volumeElem.innerHTML = `<b>${formatCurrency(purchaseResults[mapped].volume, 'kWh')}</b>`;
+            volumeElem.innerHTML = `<b>${formatCurrency(Math.abs(purchaseResults[prefix].volume), 'kWh')}</b>`;
         }
         if (amountElem) {
-            amountElem.innerHTML = `<b>${formatCurrency(purchaseResults[mapped].amount, 'đồng')}</b>`;
+            amountElem.innerHTML = `<b>${formatCurrency(Math.abs(purchaseResults[prefix].amount), 'đồng')}</b>`;
         }
     });
 }
