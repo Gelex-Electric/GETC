@@ -60,7 +60,8 @@ const displayValuePlugin = {
 
             meta.data.forEach((bar, index) => {
                 const value = dataset.data[index];
-                if (value !== null && value !== undefined) {
+                // Chỉ hiển thị giá trị nếu khác null, undefined và khác 0
+                if (value !== null && value !== undefined && value !== 0) {
                     const formattedValue = new Intl.NumberFormat('vi-VN').format(value);
                     ctx.fillStyle = 'black';
                     ctx.font = '10px Arial';
@@ -71,6 +72,7 @@ const displayValuePlugin = {
         });
     }
 };
+
 
 const stackedValuePlugin = {
     id: 'stackedValueLabels',
