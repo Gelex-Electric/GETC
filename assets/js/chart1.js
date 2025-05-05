@@ -9,57 +9,44 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function displaychart(data) {
-    const monthslabels = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
-    const values2023 = Array(12).fill(0); 
+    const monthslabels = [
+      "Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6",
+      "Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"
+    ];
+    const values2023 = Array(12).fill(0);
     const values2024 = Array(12).fill(0);
     const values2025 = Array(12).fill(0);
 
     data.forEach(row => {
-        const date = row['Ngày'];
+        const mkh = row['MKH'] || '';               // đọc cột MKH
+        if (mkh.startsWith('EVN')) return;          // bỏ qua nếu MKH bắt đầu bằng "EVN"
+
+        const date = row['Ngày'];                   // chuỗi "dd/MM/yyyy"
         const tongSL = parseFloat(row['Tổng SL']) || 0;
         const [day, month, year] = date.split('/');
-        const monthIndex = parseInt(month, 10) - 1; 
+        const monthIndex = parseInt(month, 10) - 1;  // 0–11
 
-        if (tongSL > 0) {
-            if (year === '2023') {
-                values2023[monthIndex] += tongSL;
-            }
-            if (year === '2024') {
-                values2024[monthIndex] += tongSL;
-            } 
-            if (year === '2025') {
-                values2025[monthIndex] += tongSL;
-            } 
-        }   
+        // Không còn kiểm tra tongSL > 0, vẫn cộng dồn mọi giá trị
+        if (year === '2023') {
+            values2023[monthIndex] += tongSL;
+        } else if (year === '2024') {
+            values2024[monthIndex] += tongSL;
+        } else if (year === '2025') {
+            values2025[monthIndex] += tongSL;
+        }
     });
 
+    // (phần vẽ chart giữ nguyên như trước)
     const ctx = document.getElementById('barChart').getContext('2d');
+    if (window.myChart) window.myChart.destroy(); // nếu muốn tái sử dụng hàm nhiều lần
     window.myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: monthslabels,
             datasets: [
-                {
-                    label: 'Năm 2023',
-                    data: values2023,
-                    backgroundColor: 'rgba(0, 105, 148, 0.6)',
-                    borderColor: 'rgba(0, 105, 148, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Năm 2024',
-                    data: values2024,
-                    backgroundColor: 'rgba(255, 165, 0, 0.6)',
-                    borderColor: 'rgba(255, 165, 0, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Năm 2025',
-                    data: values2025,
-                    backgroundColor: 'rgba(255, 0, 0, 0.6)',
-                    borderColor: 'rgb(255, 0, 106)',
-                    borderWidth: 1
-                }
+                { label: 'Năm 2023', data: values2023, backgroundColor: 'rgba(0,105,148,0.6)', borderColor: 'rgba(0,105,148,1)', borderWidth: 1 },
+                { label: 'Năm 2024', data: values2024, backgroundColor: 'rgba(255,165,0,0.6)',   borderColor: 'rgba(255,165,0,1)',   borderWidth: 1 },
+                { label: 'Năm 2025', data: values2025, backgroundColor: 'rgba(255,0,0,0.6)',     borderColor: 'rgb(255,0,106)',      borderWidth: 1 }
             ]
         },
         options: {
@@ -67,26 +54,22 @@ function displaychart(data) {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    onClick: function(e, legendItem, legend) {
-                        const index = legendItem.datasetIndex;
-                        const chart = legend.chart;
+                    onClick(e, legendItem, legend) {
                         Chart.defaults.plugins.legend.onClick(e, legendItem, legend);
-                        updateTotals(chart);
+                        updateTotals(legend.chart);
                     }
                 },
                 title: {
                     display: true,
                     text: 'Biểu đồ phụ tải năm',
-                    font: {
-                        size: 20
-                    }
+                    font: { size: 20 }
                 },
                 tooltip: {
                     callbacks: {
-                        label: function (tooltipItem) {
+                        label(tooltipItem) {
                             const value = tooltipItem.raw;
-                            const formattedValue = new Intl.NumberFormat('vi-VN').format(value);
-                            return `${tooltipItem.dataset.label}: ${formattedValue} kWh`;
+                            const formatted = new Intl.NumberFormat('vi-VN').format(value);
+                            return `${tooltipItem.dataset.label}: ${formatted} kWh`;
                         }
                     }
                 }
@@ -94,16 +77,14 @@ function displaychart(data) {
             scales: {
                 y: {
                     beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Sản lượng (kWh)'
-                    }
+                    title: { display: true, text: 'Sản lượng (kWh)' }
                 }
             }
         },
-        plugins: [displayValuePlugin]
+        plugins: [ displayValuePlugin ]
     });
 }
+
 
 function updateTotals(chart) {
     if (!chart.data.datasets || chart.data.datasets.length === 0) return;
