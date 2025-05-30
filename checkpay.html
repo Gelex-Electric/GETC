@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo kinh doanh điện GETC</title>
+  <link rel="shortcut icon" href="./assets/logo/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="./assets/css/app.css">
+  <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+    </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div class="sidebar-wrapper active">
+        <!-- Sidebar Header -->
+        <div class="sidebar-header position-relative">
+          <div class="d-flex justify-content-between align-items-center">
+            <!-- Logo Placeholder -->
+              <div class="logo">
+                <a href="index.html">
+                  <img src="./assets/logo/Logo.svg" alt="GETC">
+                </a>
+              </div>
+              <!-- Sidebar Toggler -->
+              <div class="sidebar-toggler">
+                <a href="#" class="sidebar-hide d-xl-none d-block">
+                  <i class="bi bi-x bi-middle"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+              <!-- Sidebar Links -->
+          <nav class="sidebar-menu">
+            <ul class="menu">
+              <li class="sidebar-title">Menu</li>
+              <li class="sidebar-item">
+                <a href="index.html" class="sidebar-link">
+                  <i class="bi bi-grid-fill"></i>
+                  <span>Tổng hợp</span>
+                </a>
+              </li>
+              <li class="sidebar-item  has-sub ">
+                <a href="#" class='sidebar-link'>
+                  <i class="bi bi-stack"></i>
+                  <span>Chi Tiết</span>
+                </a>
+                  <ul class="submenu">
+                    <li class="submenu-item">
+                      <a href="#" class="submenu-link">KCN Tiền Hải</a>
+                    </li>
+                    <li class="submenu-item  ">
+                      <a href="#" class="submenu-link">KCN Phong Điền</a>
+                    </li>
+                    <li class="submenu-item  ">
+                    <a href="#" class="submenu-link">KCN Số 3</a>
+                    </li>
+                    <li class="submenu-item  ">
+                      <a href="#" class="submenu-link">KCN Yên Mỹ</a>
+                    </li>
+                  </ul>
+              </li>
+              <!-- Sideitems 1 -->
+              <li class="sidebar-item active">
+                <a href="#" class="sidebar-link">
+                  <i class="bi bi-cash"></i>
+                  <span>Công nợ khách hàng</span>
+                </a>
+              </li>
+            </ul>
+          </nav>      
+      </div>
+    </div>
+  </div>
+  <!-- Main Content -->
+  <div id="main">
+    <header class="mb-3">
+      <a href="#" class="burger-btn d-block d-xl-none">
+        <i class="bi bi-justify fs-3"></i>
+      </a>
+    </header>
+    <section class="section">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <h4>Bảng công nợ khách hàng</h4>
+            </div>
+            <div class="card-body">
+              <div class="row mb-4">
+                <div class="col-md-4">
+                  <div class="input-group mb-3">
+                    <label class="input-group-text" for="periodSelect">Chọn đợt thanh toán</label>
+                    <select class="form-select" id="periodSelect">
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingTH">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTH" aria-expanded="true" aria-controls="collapseTH">
+                      Khu công nghiệp Yên Mỹ
+                    </button>
+                  </h2>
+                  <div id="collapseTH" class="accordion-collapse collapse show" aria-labelledby="headingTH" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      <div id="pivotContainer1"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingPD">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePD" aria-expanded="false" aria-controls="collapsePD">
+                      Khu công nghiệp Tiền Hải
+                    </button>
+                  </h2>
+                  <div id="collapsePD" class="accordion-collapse collapse" aria-labelledby="headingPD" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      <div id="pivotContainer2"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingYM">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseYM" aria-expanded="false" aria-controls="collapseYM">
+                      Khu công nghiệp Số 3
+                    </button>
+                  </h2>
+                  <div id="collapseYM" class="accordion-collapse collapse" aria-labelledby="headingYM" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      <div id="pivotContainer3"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="heading03">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse03" aria-expanded="false" aria-controls="collapse03">
+                      Khu công nghiệp Phong Điền
+                    </button>
+                  </h2>
+                  <div id="collapse03" class="accordion-collapse collapse" aria-labelledby="heading03" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      <div id="pivotContainer4"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> 
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script type="module" src="./assets/js/chart.js"></script>
+  <script type="module" src="./assets/js/pivot.js"></script>
+  <script src="./assets/js/app.js"></script>
+</body>
+</html>
