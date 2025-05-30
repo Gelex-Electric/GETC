@@ -4,7 +4,9 @@ import { loadCSV } from './csvReader.js';
 const style = document.createElement('style');
 style.textContent = `
   .parent-row.fully-paid { background-color: #c8e6c9; }
+  .parent-row:not(.fully-paid) { background-color: #ffcdd2; }
   .child-paid { background-color: #e8f5e9; }
+  .child-unpaid { background-color: #ffebee; }
   .checkmark { color: green; font-size: 1.2em; text-align: center; }
 `;
 document.head.appendChild(style);
@@ -63,7 +65,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const addrData = filtered.filter(r => r.address === addr);
       if (!addrData.length) return;
 
-
       // Group by customer
       const groups = {};
       addrData.forEach(r => {
@@ -97,6 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const trP = document.createElement('tr');
         trP.classList.add('parent-row');
         if (isFully) trP.classList.add('fully-paid');
+        // parent rows without full payment get red background via CSS
         const mark = isFully ? '<td class="checkmark">✔</td>' : '<td></td>';
         trP.innerHTML = `
           <td><button class="toggle-btn" data-key="${idx}_${gIdx}">+</button></td>
@@ -118,6 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const trC = document.createElement('tr');
           trC.classList.add(`group-${idx}_${gIdx}`);
           if (it.hasPayment) trC.classList.add('child-paid');
+          else trC.classList.add('child-unpaid');
           trC.style.display = 'none';
           trC.innerHTML = `
             <td></td>
