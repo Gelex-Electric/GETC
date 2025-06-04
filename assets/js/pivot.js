@@ -46,7 +46,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   periodSelect.value = periodSelect.options[0].value;
 
   const containerIds = ['pivotContainer1', 'pivotContainer2', 'pivotContainer3', 'pivotContainer4'];
-  const addresses = Array.from(new Set(data.map(r => r.address)));
+  const addresses = [
+    'KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình',
+    'KCN Phong Điền- Viglacera, Thành phố Huế',
+    'KCN Số 3, huyện Ân Thi, Tỉnh Hưng Yên',
+    'KCN Yên Mỹ, huyện Yên Mỹ, Tỉnh Hưng Yên'
+  ];
 
   function renderPivot() {
     const [selM, selY] = periodSelect.value.split('/').map(n => +n);
