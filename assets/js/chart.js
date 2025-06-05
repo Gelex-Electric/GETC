@@ -45,6 +45,7 @@ export async function renderChart(ctx) {
       layout: { padding: { top: 20 } },
       scales: { y: { beginAtZero: true } },
       plugins: {
+        legend: { position: 'right' },
         // Hiển thị số trên đỉnh cột (không kèm đơn vị)
         datalabels: {
           anchor: 'end',
