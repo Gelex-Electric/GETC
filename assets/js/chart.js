@@ -31,7 +31,7 @@ export async function renderChart(ctx) {
 
   // Tạo datasets, mỗi năm một dataset
   const datasets = years.map(y => ({
-    label: `${y}`,
+    label: `Năm ${y}`,
     data: monthlySums[y],
     borderWidth: 1
   }));
@@ -42,6 +42,7 @@ export async function renderChart(ctx) {
     data: { labels, datasets },
     options: {
       responsive: true,
+      layout: { padding: { top: 20 } },
       scales: { y: { beginAtZero: true } },
       plugins: {
         // Hiển thị số trên đỉnh cột (không kèm đơn vị)
