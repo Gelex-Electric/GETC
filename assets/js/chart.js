@@ -43,9 +43,14 @@ export async function renderChart(ctx) {
     options: {
       responsive: true,
       layout: { padding: { top: 20 } },
-      scales: { y: { beginAtZero: true } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'Sản lượng (kWh)' }
+        }
+      },
       plugins: {
-        legend: { position: 'right' },
+        legend: { position: 'bottom' },
         // Hiển thị số trên đỉnh cột (không kèm đơn vị)
         datalabels: {
           anchor: 'end',
@@ -81,10 +86,11 @@ export async function renderStackedChart(ctx) {
     const [day, month, year] = row['Ngày chốt chỉ số'].split('/');
     const date = new Date(year, month - 1, day);
     const value = parseFloat(row['Sản lượng'].replace(/\./g, ''));
-    const addr = row['Địa chỉ sử dụng điện'];
+    const cost  = parseFloat(row['Doanh thu'].replace(/\./g, ''));
+    const addr  = row['Địa chỉ sử dụng điện'];
     const match = addr.match(/KCN[^,]*/);
-    const zone = match ? match[0].trim() : 'Khác';
-    return { date, value, zone };
+    const zone  = match ? match[0].trim() : 'Khác';
+    return { date, value, cost, zone };
   });
 
   // Determine latest closing month
@@ -98,13 +104,17 @@ export async function renderStackedChart(ctx) {
   }
 
   const zones = [...new Set(parsed.map(p => p.zone))];
-  const zoneSums = Object.fromEntries(zones.map(z => [z, Array(12).fill(0)]));
+  const zoneSums  = Object.fromEntries(zones.map(z => [z, Array(12).fill(0)]));
+  const zoneCosts = Object.fromEntries(zones.map(z => [z, Array(12).fill(0)]));
+  const monthlyTotal = Array(12).fill(0);
 
-  parsed.forEach(({ date, value, zone }) => {
+  parsed.forEach(({ date, value, cost, zone }) => {
     const diff = (latest.getFullYear() - date.getFullYear()) * 12 + (latest.getMonth() - date.getMonth());
     if (diff >= 0 && diff < 12) {
       const idx = 11 - diff;
       zoneSums[zone][idx] += value;
+      zoneCosts[zone][idx] += cost;
+      monthlyTotal[idx] += value;
     }
   });
 
@@ -119,14 +129,38 @@ export async function renderStackedChart(ctx) {
     data: { labels, datasets },
     options: {
       responsive: true,
-      scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+      scales: {
+        x: { stacked: true },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          title: { display: true, text: 'Sản lượng (kWh)' }
+        }
+      },
       plugins: {
-        legend: { position: 'right' },
+        legend: { position: 'bottom' },
         datalabels: {
           anchor: 'center',
           align: 'center',
-          color: '#fff',
-          formatter: v => formatNumber(v)
+          color: '#000',
+          formatter: (v, ctx) => {
+            const idx = ctx.dataIndex;
+            return v >= monthlyTotal[idx] * 0.1 ? formatNumber(v) : '';
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const idx = ctx.dataIndex;
+              const zone = zones[ctx.datasetIndex];
+              const prod = zoneSums[zone][idx];
+              const cost = zoneCosts[zone][idx];
+              return [
+                `Sản lượng: ${formatNumberWithUnit(prod, 'kWh')}`,
+                `Doanh thu: ${formatNumberWithUnit(cost, 'đồng')}`
+              ];
+            }
+          }
         }
       }
     },
