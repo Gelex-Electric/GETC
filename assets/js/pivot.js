@@ -45,12 +45,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   periodSelect.value = periodSelect.options[0].value;
 
-  const containerIds = ['pivotContainer1', 'pivotContainer2', 'pivotContainer3', 'pivotContainer4'];
+  const containerIds = ['pivotContainer1', 'pivotContainer2', 'pivotContainer3', 'pivotContainer4', 'pivotContainer5'];
   const addresses = [
     'KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình',
     'KCN Phong Điền- Viglacera, Thành phố Huế',
     'KCN Số 3, huyện Ân Thi, Tỉnh Hưng Yên',
-    'KCN Yên Mỹ, huyện Yên Mỹ, Tỉnh Hưng Yên'
+    'KCN Yên Mỹ, huyện Yên Mỹ, Tỉnh Hưng Yên',
+    'KCN Thuận Thành I, Tỉnh Bắc Ninh'
   ];
 
   function renderPivot() {
