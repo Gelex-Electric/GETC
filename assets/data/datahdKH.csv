@@ -1,14 +1,10 @@
-<<<<<<< HEAD
-﻿"Mã khách hàng","Địa chỉ sử dụng điện","Tên khách hàng","Ngày xuất hóa đơn","Ngày chốt chỉ số","Ngày thanh toán","Kỳ","Doanh thu","Số tiền sau thuế","Sản lượng","Sản lượng phản kháng","Attachments"
+﻿"Mã khách hàng","Địa chỉ sử dụng điện","Tên khách hàng","Ngày xuất hóa đơn","Ngày chốt chỉ số","Ngày thanh toán","Kỳ","Doanh thu","Số tiền sau thuế","Sản lượng","Sản lượng phản kháng","Đính kèm"
 "KCNYM-003","KCN Yên Mỹ, huyện Yên Mỹ, Tỉnh Hưng Yên","CÔNG TY TNHH ĐIỆN KHÍ JILI VIỆT NAM","10/06/2025","10/06/2025",,"1","136.441.486 ₫","147.356.805 ₫","61.702","0","1"
-"KCNYM-004","KCN Yên Mỹ, huyện Yên Mỹ, Tỉnh Hưng Yên","CÔNG TY CỔ PHẦN THƯƠNG MẠI VÀ CÔNG NGHIỆP MINH QUANG IDS","10/06/2025","10/06/2025",,"1","92.187.976 ₫","99.563.014 ₫","40.252","0","1"
+"KCNYM-004","KCN Yên Mỹ, huyện Yên Mỹ, Tỉnh Hưng Yên","CÔNG TY CỔ PHẦN THƯƠNG MẠI VÀ CÔNG NGHIỆP MINH QUANG IDS","10/06/2025","10/06/2025","10/06/2025","1","92.187.976 ₫","99.563.014 ₫","40.252","0","1"
 "KCNYM-002A","KCN Yên Mỹ, huyện Yên Mỹ, Tỉnh Hưng Yên","CÔNG TY TNHH CÔNG NGHỆ MÔI TRƯỜNG LIHUA (VIỆT NAM)","10/06/2025","10/06/2025",,"1","174.947.791 ₫","174.947.791 ₫","79.564","0","1"
 "KCNYM-001","KCN Yên Mỹ, huyện Yên Mỹ, Tỉnh Hưng Yên","CÔNG TY CỔ PHẦN CƠ KHÍ VNC","10/06/2025","10/06/2025",,"1","85.587.630 ₫","92.434.640 ₫","45.720","0","1"
 "KCNTTI-002","KCN Thuận Thành I, Tỉnh Bắc Ninh","CÔNG TY CỔ PHẦN THIẾT KẾ VÀ XÂY DỰNG GIZA VIỆT NAM","10/06/2025","10/06/2025",,"1","20.095.547 ₫","21.703.191 ₫","9.395","0","1"
 "KCNTH-002","KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình","CÔNG TY TNHH VẢI TÚI KHÍ ASAHI KASEI VIỆT NAM","10/06/2025","10/06/2025",,"1","230.829.012 ₫","230.829.012 ₫","105.300","0","1"
-=======
-﻿"Mã khách hàng","Địa chỉ sử dụng điện","Tên khách hàng","Ngày xuất hóa đơn","Ngày chốt chỉ số","Ngày thanh toán","Kỳ","Doanh thu","Số tiền sau thuế","Sản lượng","Sản lượng phản kháng","Đính kèm"
->>>>>>> 49c8059e801c870c1f03ea84f0e83bccc08f33c8
 "KCNTH-011","KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình","CÔNG TY TNHH XULI CARGO CONTROL (VIET NAM)","31/05/2025","31/05/2025","06/06/2025","2","238.845.546 ₫","238.845.546 ₫","93.651","0","1"
 "KCNTH-008","KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình"," CÔNG TY TNHH HUM&C VINA","31/05/2025","31/05/2025","05/06/2025","2","117.695.810 ₫","117.695.810 ₫","53.747","0","1"
 "KCN03-005","KCN Số 3, huyện Ân Thi, Tỉnh Hưng Yên","CÔNG TY CỔ PHẦN LOGOS VIỆT NAM HY 1","31/05/2025","31/05/2025",,"1","44.507.837 ₫","48.068.464 ₫","12.805","0","1"
@@ -18,7 +14,7 @@
 "KCN03-003A","KCN Số 3, huyện Ân Thi, Tỉnh Hưng Yên","CÔNG TY TNHH XÂY DỰNG VÀ THƯƠNG MẠI AN TÂM","31/05/2025","31/05/2025","06/06/2025","1","20.023.639 ₫","21.625.530 ₫","8.784","0","1"
 "KCN03-002A","KCN Số 3, huyện Ân Thi, Tỉnh Hưng Yên","CÔNG TY CỔ PHẦN XÂY DỰNG SỐ 1","31/05/2025","31/05/2025","06/06/2025","1","47.139.833 ₫","50.911.020 ₫","20.768","0","1"
 "KCNTH-013","KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình","CÔNG TY TNHH FANTASY TECH","31/05/2025","31/05/2025","03/06/2025","1","89.705.686 ₫","89.705.686 ₫","37.891","0","1"
-"KCNTH-003A","KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình","CÔNG TY TNHH CÔNG NGHIỆP BE BRIGHT","31/05/2025","31/05/2025",,"1","36.265.885 ₫","39.167.156 ₫","16.352","0","1"
+"KCNTH-003A","KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình","CÔNG TY TNHH CÔNG NGHIỆP BE BRIGHT","31/05/2025","31/05/2025","12/06/2025","1","36.265.885 ₫","39.167.156 ₫","16.352","0","1"
 "KCNTH-009A","KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình","CHI NHÁNH CÔNG TY TNHH XÂY DỰNG VÀ ĐẦU TƯ THƯƠNG MẠI HỢP NHẤT VIỆT NAM","31/05/2025","31/05/2025","09/06/2025","1","6.275.907 ₫","6.777.980 ₫","2.789","0","1"
 "KCNTH-005","KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình"," CÔNG TY CỔ PHẦN FTA E&C VIỆT NAM","31/05/2025","31/05/2025","04/06/2025","1","6.828.280 ₫","7.374.542 ₫","3.274","0","1"
 "KCNTH-007","KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình","CÔNG TY TNHH SINHER TECHNOLOGY VIỆT NAM","31/05/2025","31/05/2025","05/06/2025","1","35.515.684 ₫","35.515.684 ₫","16.048","0","1"
