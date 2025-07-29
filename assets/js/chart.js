@@ -18,6 +18,17 @@ function updateTotals(data) {
     formatNumberWithUnit(totalCost, 'đồng');
 }
 
+
+function renderMainChart(filtered, yearFilter) {
+  const ctx = document.getElementById('myChart').getContext('2d');
+  if (chart1) {
+    chart1.destroy();
+    ctx.canvas.style.width = '100%';
+    ctx.canvas.style.height = '400px';
+  }
+
+
+
 function renderMainChart(filtered, yearFilter) {
   const ctx = document.getElementById('myChart').getContext('2d');
   if (chart1) chart1.destroy();
@@ -80,7 +91,14 @@ function renderMainChart(filtered, yearFilter) {
 
 function renderStacked(filtered, zoneFilter) {
   const ctx = document.getElementById('stackedChart').getContext('2d');
+
+  if (chart2) {
+    chart2.destroy();
+    ctx.canvas.style.width = '100%';
+    ctx.canvas.style.height = '400px';
+  }
   if (chart2) chart2.destroy();
+
 
   const latest = filtered.reduce((m, r) => (r.date > m ? r.date : m), new Date(0));
   const labels = [];
@@ -152,9 +170,19 @@ function renderStacked(filtered, zoneFilter) {
   });
 }
 
+
+function getActiveValue(listId) {
+  const active = document.querySelector(`#${listId} .active`);
+  return active ? active.dataset.value : 'all';
+}
+
+function applyFilters() {
+  const yearValue = getActiveValue('yearList');
+  const zoneValue = getActiveValue('zoneList');
 function applyFilters() {
   const yearValue = document.getElementById('yearSelect').value;
   const zoneValue = document.getElementById('zoneSelect').value;
+ main
   const filtered = rawData.filter(r =>
     (yearValue === 'all' || r.date.getFullYear() === parseInt(yearValue, 10)) &&
     (zoneValue === 'all' || r.zone === zoneValue)
@@ -178,6 +206,34 @@ async function init() {
   years = [...new Set(rawData.map(r => r.date.getFullYear()))].sort();
   zones = [...new Set(rawData.map(r => r.zone))].sort();
 
+
+  const yearList = document.getElementById('yearList');
+  const zoneList = document.getElementById('zoneList');
+  if (yearList) {
+    yearList.innerHTML =
+      '<li class="list-group-item active" data-value="all">Tất cả</li>' +
+      years.map(y => `<li class="list-group-item" data-value="${y}">${y}</li>`).join('');
+    yearList.addEventListener('click', e => {
+      const item = e.target.closest('li');
+      if (!item) return;
+      yearList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+      item.classList.add('active');
+      applyFilters();
+    });
+  }
+  if (zoneList) {
+    zoneList.innerHTML =
+      '<li class="list-group-item active" data-value="all">Tất cả</li>' +
+      zones.map(z => `<li class="list-group-item" data-value="${z}">${z}</li>`).join('');
+    zoneList.addEventListener('click', e => {
+      const item = e.target.closest('li');
+      if (!item) return;
+      zoneList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+      item.classList.add('active');
+      applyFilters();
+    });
+  }
+
   const yearSelect = document.getElementById('yearSelect');
   const zoneSelect = document.getElementById('zoneSelect');
   if (yearSelect) {
@@ -190,6 +246,7 @@ async function init() {
   }
   yearSelect.addEventListener('change', applyFilters);
   zoneSelect.addEventListener('change', applyFilters);
+main
 
   applyFilters();
 }
