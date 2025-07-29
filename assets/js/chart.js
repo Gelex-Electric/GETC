@@ -4,26 +4,32 @@ import { formatNumber, formatNumberWithUnit } from './format.js';
 // Chart.js plugin data labels (tải qua <script> trong HTML)
 Chart.register(ChartDataLabels);
 
-export async function renderChart(ctx) {
-  const data = await loadCSV('assets/data/datahdKH.csv');
+let cachedData = null;
 
-  // Parse
-  const parsed = data.map(row => {
+export async function loadData() {
+  if (cachedData) return cachedData;
+  const raw = await loadCSV('assets/data/datahdKH.csv');
+  cachedData = raw.map(row => {
     const [day, month, year] = row['Ngày chốt chỉ số'].split('/');
     const date = new Date(year, month - 1, day);
     const value = parseFloat(row['Sản lượng'].replace(/\./g, ''));
     const cost  = parseFloat(row['Doanh thu'].replace(/\./g, ''));
-    return { date, value, cost };
+    const zone  = row['Địa chỉ sử dụng điện'].split(',')[0].trim();
+    return { date, value, cost, zone };
   });
+  return cachedData;
+}
+
+export function renderChart(ctx, data) {
 
   // Danh sách năm và khởi tạo tổng theo tháng
-  const years = [...new Set(parsed.map(i => i.date.getFullYear()))].sort();
+  const years = [...new Set(data.map(i => i.date.getFullYear()))].sort();
   const monthlySums = Object.fromEntries(years.map(y => [y, Array(12).fill(0)]));
-  parsed.forEach(({ date, value }) => {
+  data.forEach(({ date, value }) => {
     monthlySums[date.getFullYear()][date.getMonth()] += value;
   });
   const monthlyCosts = Object.fromEntries(years.map(y => [y, Array(12).fill(0)]));
-  parsed.forEach(({ date, cost }) => {
+  data.forEach(({ date, cost }) => {
     monthlyCosts[date.getFullYear()][date.getMonth()] += cost;
   });
   // Nhãn trục X: Tháng 1–12
@@ -37,7 +43,7 @@ export async function renderChart(ctx) {
   }));
 
   // Vẽ biểu đồ cột nhóm
-  new Chart(ctx, {
+  return new Chart(ctx, {
     type: 'bar',
     data: { labels, datasets },
     options: {
@@ -78,20 +84,10 @@ export async function renderChart(ctx) {
   });
 }
 
-export async function renderStackedChart(ctx) {
-  const data = await loadCSV('assets/data/datahdKH.csv');
+export function renderStackedChart(ctx, data) {
 
-  // Parse: date, production and industrial zone name
-  const parsed = data.map(row => {
-    const [day, month, year] = row['Ngày chốt chỉ số'].split('/');
-    const date = new Date(year, month - 1, day);
-    const value = parseFloat(row['Sản lượng'].replace(/\./g, ''));
-    const cost  = parseFloat(row['Doanh thu'].replace(/\./g, ''));
-    const addr  = row['Địa chỉ sử dụng điện'];
-    const match = addr.match(/KCN[^,]*/);
-    const zone  = match ? match[0].trim() : 'Khác';
-    return { date, value, cost, zone };
-  });
+  // Parse already done in loadData()
+  const parsed = data;
 
   // Determine latest closing month
   const latest = parsed.reduce((m, r) => (r.date > m ? r.date : m), new Date(0));
@@ -124,7 +120,7 @@ export async function renderStackedChart(ctx) {
     borderWidth: 1
   }));
 
-  new Chart(ctx, {
+  return new Chart(ctx, {
     type: 'bar',
     data: { labels, datasets },
     options: {
@@ -168,13 +164,3 @@ export async function renderStackedChart(ctx) {
   });
 }
 
-// Tự động gọi vẽ khi DOM sẵn sàng
-document.addEventListener('DOMContentLoaded', () => {
-  const ctx = document.getElementById('myChart').getContext('2d');
-  renderChart(ctx);
-
-  const stackedEl = document.getElementById('stackedChart');
-  if (stackedEl) {
-    renderStackedChart(stackedEl.getContext('2d'));
-  }
-});
