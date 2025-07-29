@@ -1,4 +1,5 @@
 import { loadCSV } from './csvReader.js';
+import { formatNumber } from './format.js';
 
 // Dynamic CSS for conditional coloring and checkmark
 const style = document.createElement('style');
@@ -110,9 +111,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td><button class="toggle-btn" data-key="${idx}_${gIdx}">+</button></td>
           <td>${name}</td>
           ${mark}
-          <td>${grp.totals.amount.toLocaleString()}</td>
-          <td>${grp.totals.active.toLocaleString()}</td>
-          <td>${grp.totals.reactive.toLocaleString()}</td>
+          <td>${formatNumber(grp.totals.amount)}</td>
+          <td>${formatNumber(grp.totals.active)}</td>
+          <td>${formatNumber(grp.totals.reactive)}</td>
         `;
         tbody.appendChild(trP);
 
@@ -132,9 +133,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td></td>
             <td>${periodText}</td>
             <td>${pdStr}</td>
-            <td>${it.amount.toLocaleString()}</td>
-            <td>${it.active.toLocaleString()}</td>
-            <td>${it.reactive.toLocaleString()}</td>
+            <td>${formatNumber(it.amount)}</td>
+            <td>${formatNumber(it.active)}</td>
+            <td>${formatNumber(it.reactive)}</td>
           `;
           tbody.appendChild(trC);
         });
