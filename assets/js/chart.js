@@ -160,9 +160,14 @@ function renderStacked(filtered, zoneFilter) {
   });
 }
 
+function getActiveValue(listId) {
+  const active = document.querySelector(`#${listId} .active`);
+  return active ? active.dataset.value : 'all';
+}
+
 function applyFilters() {
-  const yearValue = document.getElementById('yearSelect').value;
-  const zoneValue = document.getElementById('zoneSelect').value;
+  const yearValue = getActiveValue('yearList');
+  const zoneValue = getActiveValue('zoneList');
   const filtered = rawData.filter(r =>
     (yearValue === 'all' || r.date.getFullYear() === parseInt(yearValue, 10)) &&
     (zoneValue === 'all' || r.zone === zoneValue)
@@ -186,18 +191,32 @@ async function init() {
   years = [...new Set(rawData.map(r => r.date.getFullYear()))].sort();
   zones = [...new Set(rawData.map(r => r.zone))].sort();
 
-  const yearSelect = document.getElementById('yearSelect');
-  const zoneSelect = document.getElementById('zoneSelect');
-  if (yearSelect) {
-    yearSelect.innerHTML = '<option value="all">Tất cả</option>' +
-      years.map(y => `<option value="${y}">${y}</option>`).join('');
+  const yearList = document.getElementById('yearList');
+  const zoneList = document.getElementById('zoneList');
+  if (yearList) {
+    yearList.innerHTML =
+      '<li class="list-group-item active" data-value="all">Tất cả</li>' +
+      years.map(y => `<li class="list-group-item" data-value="${y}">${y}</li>`).join('');
+    yearList.addEventListener('click', e => {
+      const item = e.target.closest('li');
+      if (!item) return;
+      yearList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+      item.classList.add('active');
+      applyFilters();
+    });
   }
-  if (zoneSelect) {
-    zoneSelect.innerHTML = '<option value="all">Tất cả</option>' +
-      zones.map(z => `<option value="${z}">${z}</option>`).join('');
+  if (zoneList) {
+    zoneList.innerHTML =
+      '<li class="list-group-item active" data-value="all">Tất cả</li>' +
+      zones.map(z => `<li class="list-group-item" data-value="${z}">${z}</li>`).join('');
+    zoneList.addEventListener('click', e => {
+      const item = e.target.closest('li');
+      if (!item) return;
+      zoneList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+      item.classList.add('active');
+      applyFilters();
+    });
   }
-  yearSelect.addEventListener('change', applyFilters);
-  zoneSelect.addEventListener('change', applyFilters);
 
   applyFilters();
 }
