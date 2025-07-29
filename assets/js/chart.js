@@ -1,70 +1,70 @@
 import { loadCSV } from './csvReader.js';
 import { formatNumber, formatNumberWithUnit } from './format.js';
 
-// Chart.js plugin data labels (tải qua <script> trong HTML)
 Chart.register(ChartDataLabels);
 
-export async function renderChart(ctx) {
-  const data = await loadCSV('assets/data/datahdKH.csv');
+let rawData = [];
+let years = [];
+let zones = [];
+let chart1;
+let chart2;
 
-  // Parse
-  const parsed = data.map(row => {
-    const [day, month, year] = row['Ngày chốt chỉ số'].split('/');
-    const date = new Date(year, month - 1, day);
-    const value = parseFloat(row['Sản lượng'].replace(/\./g, ''));
-    const cost  = parseFloat(row['Doanh thu'].replace(/\./g, ''));
-    return { date, value, cost };
-  });
+function updateTotals(data) {
+  const totalProd = data.reduce((s, r) => s + r.value, 0);
+  const totalCost = data.reduce((s, r) => s + r.cost, 0);
+  document.getElementById('totalProduction').textContent =
+    formatNumberWithUnit(totalProd, 'kWh');
+  document.getElementById('totalRevenue').textContent =
+    formatNumberWithUnit(totalCost, 'đồng');
+}
 
-  // Danh sách năm và khởi tạo tổng theo tháng
-  const years = [...new Set(parsed.map(i => i.date.getFullYear()))].sort();
-  const monthlySums = Object.fromEntries(years.map(y => [y, Array(12).fill(0)]));
-  parsed.forEach(({ date, value }) => {
-    monthlySums[date.getFullYear()][date.getMonth()] += value;
-  });
-  const monthlyCosts = Object.fromEntries(years.map(y => [y, Array(12).fill(0)]));
-  parsed.forEach(({ date, cost }) => {
-    monthlyCosts[date.getFullYear()][date.getMonth()] += cost;
-  });
-  // Nhãn trục X: Tháng 1–12
-  const labels = Array.from({ length: 12 }, (_, i) => `Tháng ${i+1}`);
+function renderMainChart(filtered, yearFilter) {
+  const ctx = document.getElementById('myChart').getContext('2d');
+  if (chart1) chart1.destroy();
 
-  // Tạo datasets, mỗi năm một dataset
-  const datasets = years.map(y => ({
+  const yearsToShow = yearFilter === 'all' ? years : [parseInt(yearFilter, 10)];
+  const monthly = {};
+  const monthlyCost = {};
+  yearsToShow.forEach(y => {
+    monthly[y] = Array(12).fill(0);
+    monthlyCost[y] = Array(12).fill(0);
+  });
+  filtered.forEach(r => {
+    const y = r.date.getFullYear();
+    if (!monthly[y]) return;
+    monthly[y][r.date.getMonth()] += r.value;
+    monthlyCost[y][r.date.getMonth()] += r.cost;
+  });
+  const labels = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`);
+  const datasets = yearsToShow.map(y => ({
     label: `Năm ${y}`,
-    data: monthlySums[y],
+    data: monthly[y],
     borderWidth: 1
   }));
 
-  // Vẽ biểu đồ cột nhóm
-  new Chart(ctx, {
+  chart1 = new Chart(ctx, {
     type: 'bar',
     data: { labels, datasets },
     options: {
       responsive: true,
       layout: { padding: { top: 20 } },
       scales: {
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: 'Sản lượng (kWh)' }
-        }
+        y: { beginAtZero: true, title: { display: true, text: 'Sản lượng (kWh)' } }
       },
       plugins: {
         legend: { position: 'bottom' },
-        // Hiển thị số trên đỉnh cột (không kèm đơn vị)
         datalabels: {
           anchor: 'end',
           align: 'top',
-          formatter: (value) => formatNumber(value)
+          formatter: v => formatNumber(v)
         },
-        // Tooltip hiển thị số kèm ' kWh'
         tooltip: {
           callbacks: {
-            label: (ctx) => {
-              const month = ctx.dataIndex;
-              const year  = years[ctx.datasetIndex];
-              const prod  = ctx.raw;
-              const cost  = monthlyCosts[year][month];
+            label: ctx => {
+              const m = ctx.dataIndex;
+              const y = yearsToShow[ctx.datasetIndex];
+              const prod = ctx.raw;
+              const cost = monthlyCost[y][m];
               return [
                 `Sản lượng: ${formatNumberWithUnit(prod, 'kWh')}`,
                 `Doanh thu: ${formatNumberWithUnit(cost, 'đồng')}`
@@ -78,53 +78,37 @@ export async function renderChart(ctx) {
   });
 }
 
-export async function renderStackedChart(ctx) {
-  const data = await loadCSV('assets/data/datahdKH.csv');
+function renderStacked(filtered, zoneFilter) {
+  const ctx = document.getElementById('stackedChart').getContext('2d');
+  if (chart2) chart2.destroy();
 
-  // Parse: date, production and industrial zone name
-  const parsed = data.map(row => {
-    const [day, month, year] = row['Ngày chốt chỉ số'].split('/');
-    const date = new Date(year, month - 1, day);
-    const value = parseFloat(row['Sản lượng'].replace(/\./g, ''));
-    const cost  = parseFloat(row['Doanh thu'].replace(/\./g, ''));
-    const addr  = row['Địa chỉ sử dụng điện'];
-    const match = addr.match(/KCN[^,]*/);
-    const zone  = match ? match[0].trim() : 'Khác';
-    return { date, value, cost, zone };
-  });
-
-  // Determine latest closing month
-  const latest = parsed.reduce((m, r) => (r.date > m ? r.date : m), new Date(0));
-
-  // Labels for last 12 months ending at latest
+  const latest = filtered.reduce((m, r) => (r.date > m ? r.date : m), new Date(0));
   const labels = [];
   for (let i = 11; i >= 0; i--) {
     const d = new Date(latest.getFullYear(), latest.getMonth() - i, 1);
     labels.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`);
   }
 
-  const zones = [...new Set(parsed.map(p => p.zone))];
-  const zoneSums  = Object.fromEntries(zones.map(z => [z, Array(12).fill(0)]));
-  const zoneCosts = Object.fromEntries(zones.map(z => [z, Array(12).fill(0)]));
+  const zonesToShow = zoneFilter === 'all' ? zones : [zoneFilter];
+  const zoneSum = Object.fromEntries(zonesToShow.map(z => [z, Array(12).fill(0)]));
+  const zoneCost = Object.fromEntries(zonesToShow.map(z => [z, Array(12).fill(0)]));
   const monthlyTotal = Array(12).fill(0);
 
-  parsed.forEach(({ date, value, cost, zone }) => {
-    const diff = (latest.getFullYear() - date.getFullYear()) * 12 + (latest.getMonth() - date.getMonth());
+  filtered.forEach(r => {
+    if (!zonesToShow.includes(r.zone)) return;
+    const diff = (latest.getFullYear() - r.date.getFullYear()) * 12 +
+                 (latest.getMonth() - r.date.getMonth());
     if (diff >= 0 && diff < 12) {
       const idx = 11 - diff;
-      zoneSums[zone][idx] += value;
-      zoneCosts[zone][idx] += cost;
-      monthlyTotal[idx] += value;
+      zoneSum[r.zone][idx] += r.value;
+      zoneCost[r.zone][idx] += r.cost;
+      monthlyTotal[idx] += r.value;
     }
   });
 
-  const datasets = zones.map(z => ({
-    label: z,
-    data: zoneSums[z],
-    borderWidth: 1
-  }));
+  const datasets = zonesToShow.map(z => ({ label: z, data: zoneSum[z], borderWidth: 1 }));
 
-  new Chart(ctx, {
+  chart2 = new Chart(ctx, {
     type: 'bar',
     data: { labels, datasets },
     options: {
@@ -150,11 +134,11 @@ export async function renderStackedChart(ctx) {
         },
         tooltip: {
           callbacks: {
-            label: (ctx) => {
+            label: ctx => {
               const idx = ctx.dataIndex;
-              const zone = zones[ctx.datasetIndex];
-              const prod = zoneSums[zone][idx];
-              const cost = zoneCosts[zone][idx];
+              const z = zonesToShow[ctx.datasetIndex];
+              const prod = zoneSum[z][idx];
+              const cost = zoneCost[z][idx];
               return [
                 `Sản lượng: ${formatNumberWithUnit(prod, 'kWh')}`,
                 `Doanh thu: ${formatNumberWithUnit(cost, 'đồng')}`
@@ -168,13 +152,46 @@ export async function renderStackedChart(ctx) {
   });
 }
 
-// Tự động gọi vẽ khi DOM sẵn sàng
-document.addEventListener('DOMContentLoaded', () => {
-  const ctx = document.getElementById('myChart').getContext('2d');
-  renderChart(ctx);
+function applyFilters() {
+  const yearValue = document.getElementById('yearSelect').value;
+  const zoneValue = document.getElementById('zoneSelect').value;
+  const filtered = rawData.filter(r =>
+    (yearValue === 'all' || r.date.getFullYear() === parseInt(yearValue, 10)) &&
+    (zoneValue === 'all' || r.zone === zoneValue)
+  );
+  updateTotals(filtered);
+  renderMainChart(filtered, yearValue);
+  renderStacked(filtered, zoneValue);
+}
 
-  const stackedEl = document.getElementById('stackedChart');
-  if (stackedEl) {
-    renderStackedChart(stackedEl.getContext('2d'));
+async function init() {
+  const data = await loadCSV('assets/data/datahdKH.csv');
+  rawData = data.map(row => {
+    const [d, m, y] = row['Ngày chốt chỉ số'].split('/');
+    const date = new Date(y, m - 1, d);
+    const value = parseFloat(row['Sản lượng'].replace(/\./g, '')) || 0;
+    const cost = parseFloat(row['Doanh thu'].replace(/\./g, '')) || 0;
+    const match = row['Địa chỉ sử dụng điện'].match(/KCN[^,]*/);
+    const zone = match ? match[0].trim() : 'Khác';
+    return { date, value, cost, zone };
+  });
+  years = [...new Set(rawData.map(r => r.date.getFullYear()))].sort();
+  zones = [...new Set(rawData.map(r => r.zone))].sort();
+
+  const yearSelect = document.getElementById('yearSelect');
+  const zoneSelect = document.getElementById('zoneSelect');
+  if (yearSelect) {
+    yearSelect.innerHTML = '<option value="all">Tất cả</option>' +
+      years.map(y => `<option value="${y}">${y}</option>`).join('');
   }
-});
+  if (zoneSelect) {
+    zoneSelect.innerHTML = '<option value="all">Tất cả</option>' +
+      zones.map(z => `<option value="${z}">${z}</option>`).join('');
+  }
+  yearSelect.addEventListener('change', applyFilters);
+  zoneSelect.addEventListener('change', applyFilters);
+
+  applyFilters();
+}
+
+document.addEventListener('DOMContentLoaded', init);
