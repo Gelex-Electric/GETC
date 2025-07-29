@@ -17,12 +17,14 @@ function updateTotals(data) {
   document.getElementById('totalRevenue').textContent =
     formatNumberWithUnit(totalCost, 'đồng');
 }
-function renderMainChart(filtered, yearFilter) {
+function renderMainChart(filtered, yearFilters) {
   const ctx = document.getElementById('myChart').getContext('2d');
   if (chart1) {
     chart1.destroy();
   }
-  const yearsToShow = yearFilter === 'all' ? years : [parseInt(yearFilter, 10)];
+  const yearsToShow = yearFilters.length
+    ? yearFilters.map(y => parseInt(y, 10))
+    : [];
   const monthly = {};
   const monthlyCost = {};
   yearsToShow.forEach(y => {
@@ -76,7 +78,7 @@ function renderMainChart(filtered, yearFilter) {
     plugins: [ChartDataLabels]
   });
 }
-function renderStacked(filtered, zoneFilter) {
+function renderStacked(filtered, zoneFilters) {
   const ctx = document.getElementById('stackedChart').getContext('2d');
   if (chart2) {
     chart2.destroy();
@@ -87,7 +89,7 @@ function renderStacked(filtered, zoneFilter) {
     const d = new Date(latest.getFullYear(), latest.getMonth() - i, 1);
     labels.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`);
   }
-  const zonesToShow = zoneFilter === 'all' ? zones : [zoneFilter];
+  const zonesToShow = zoneFilters.length ? zoneFilters : [];
   const zoneSum = Object.fromEntries(zonesToShow.map(z => [z, Array(12).fill(0)]));
   const zoneCost = Object.fromEntries(zonesToShow.map(z => [z, Array(12).fill(0)]));
   const monthlyTotal = Array(12).fill(0);
@@ -147,20 +149,21 @@ function renderStacked(filtered, zoneFilter) {
     plugins: [ChartDataLabels]
   });
 }
-function getActiveValue(listId) {
-  const active = document.querySelector(`#${listId} .active`);
-  return active ? active.dataset.value : 'all';
+function getCheckedValues(listId) {
+  return Array.from(
+    document.querySelectorAll(`#${listId} input[type="checkbox"]:checked`)
+  ).map(cb => cb.value);
 }
 function applyFilters() {
-  const yearValue = getActiveValue('yearList');
-  const zoneValue = getActiveValue('zoneList');
+  const yearValues = getCheckedValues('yearList');
+  const zoneValues = getCheckedValues('zoneList');
   const filtered = rawData.filter(r =>
-    (yearValue === 'all' || r.date.getFullYear() === parseInt(yearValue, 10)) &&
-    (zoneValue === 'all' || r.zone === zoneValue)
+    yearValues.includes(String(r.date.getFullYear())) &&
+    zoneValues.includes(r.zone)
   );
   updateTotals(filtered);
-  renderMainChart(filtered, yearValue);
-  renderStacked(filtered, zoneValue);
+  renderMainChart(filtered, yearValues);
+  renderStacked(filtered, zoneValues);
 }
 async function init() {
   const data = await loadCSV('assets/data/datahdKH.csv');
@@ -178,29 +181,23 @@ async function init() {
   const yearList = document.getElementById('yearList');
   const zoneList = document.getElementById('zoneList');
   if (yearList) {
-    yearList.innerHTML =
-      '<li class="list-group-item active" data-value="all">Tất cả</li>' +
-      years.map(y => `<li class="list-group-item" data-value="${y}">${y}</li>`).join('');
-    yearList.addEventListener('click', e => {
-      const item = e.target.closest('li');
-      if (!item) return;
-      yearList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
-      item.classList.add('active');
-      applyFilters();
-    });
+    yearList.innerHTML = years
+      .map(
+        y =>
+          `<li class="list-group-item"><label><input type="checkbox" value="${y}" checked> ${y}</label></li>`
+      )
+      .join('');
+    yearList.addEventListener('change', applyFilters);
   }
   if (zoneList) {
-    zoneList.innerHTML =
-      '<li class="list-group-item active" data-value="all">Tất cả</li>' +
-      zones.map(z => `<li class="list-group-item" data-value="${z}">${z}</li>`).join('');
-    zoneList.addEventListener('click', e => {
-      const item = e.target.closest('li');
-      if (!item) return;
-      zoneList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
-      item.classList.add('active');
-      applyFilters();
-    });
+    zoneList.innerHTML = zones
+      .map(
+        z =>
+          `<li class="list-group-item"><label><input type="checkbox" value="${z}" checked> ${z}</label></li>`
+      )
+      .join('');
+    zoneList.addEventListener('change', applyFilters);
   }
- applyFilters();
+  applyFilters();
 }
 document.addEventListener('DOMContentLoaded', init);
