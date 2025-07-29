@@ -17,7 +17,6 @@ function updateTotals(data) {
   document.getElementById('totalRevenue').textContent =
     formatNumberWithUnit(totalCost, 'đồng');
 }
-
 function renderMainChart(filtered, yearFilter) {
   const ctx = document.getElementById('myChart').getContext('2d');
   if (chart1) {
@@ -25,7 +24,6 @@ function renderMainChart(filtered, yearFilter) {
     ctx.canvas.style.width = '100%';
     ctx.canvas.style.height = '400px';
   }
-
   const yearsToShow = yearFilter === 'all' ? years : [parseInt(yearFilter, 10)];
   const monthly = {};
   const monthlyCost = {};
@@ -45,7 +43,6 @@ function renderMainChart(filtered, yearFilter) {
     data: monthly[y],
     borderWidth: 1
   }));
-
   chart1 = new Chart(ctx, {
     type: 'bar',
     data: { labels, datasets },
@@ -81,7 +78,6 @@ function renderMainChart(filtered, yearFilter) {
     plugins: [ChartDataLabels]
   });
 }
-
 function renderStacked(filtered, zoneFilter) {
   const ctx = document.getElementById('stackedChart').getContext('2d');
   if (chart2) {
@@ -89,14 +85,12 @@ function renderStacked(filtered, zoneFilter) {
     ctx.canvas.style.width = '100%';
     ctx.canvas.style.height = '400px';
   }
-
   const latest = filtered.reduce((m, r) => (r.date > m ? r.date : m), new Date(0));
   const labels = [];
   for (let i = 11; i >= 0; i--) {
     const d = new Date(latest.getFullYear(), latest.getMonth() - i, 1);
     labels.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`);
   }
-
   const zonesToShow = zoneFilter === 'all' ? zones : [zoneFilter];
   const zoneSum = Object.fromEntries(zonesToShow.map(z => [z, Array(12).fill(0)]));
   const zoneCost = Object.fromEntries(zonesToShow.map(z => [z, Array(12).fill(0)]));
@@ -113,9 +107,7 @@ function renderStacked(filtered, zoneFilter) {
       monthlyTotal[idx] += r.value;
     }
   });
-
   const datasets = zonesToShow.map(z => ({ label: z, data: zoneSum[z], borderWidth: 1 }));
-
   chart2 = new Chart(ctx, {
     type: 'bar',
     data: { labels, datasets },
@@ -159,12 +151,10 @@ function renderStacked(filtered, zoneFilter) {
     plugins: [ChartDataLabels]
   });
 }
-
 function getActiveValue(listId) {
   const active = document.querySelector(`#${listId} .active`);
   return active ? active.dataset.value : 'all';
 }
-
 function applyFilters() {
   const yearValue = getActiveValue('yearList');
   const zoneValue = getActiveValue('zoneList');
@@ -176,7 +166,6 @@ function applyFilters() {
   renderMainChart(filtered, yearValue);
   renderStacked(filtered, zoneValue);
 }
-
 async function init() {
   const data = await loadCSV('assets/data/datahdKH.csv');
   rawData = data.map(row => {
@@ -190,7 +179,6 @@ async function init() {
   });
   years = [...new Set(rawData.map(r => r.date.getFullYear()))].sort();
   zones = [...new Set(rawData.map(r => r.zone))].sort();
-
   const yearList = document.getElementById('yearList');
   const zoneList = document.getElementById('zoneList');
   if (yearList) {
@@ -217,8 +205,6 @@ async function init() {
       applyFilters();
     });
   }
-
-  applyFilters();
+ applyFilters();
 }
-
 document.addEventListener('DOMContentLoaded', init);
