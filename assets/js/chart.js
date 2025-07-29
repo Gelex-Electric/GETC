@@ -184,7 +184,7 @@ async function init() {
     yearList.innerHTML = years
       .map(
         y =>
-          `<li class="list-group-item"><label><input type="checkbox" value="${y}" checked> ${y}</label></li>`
+          `<li class="list-group-item"><label><input class="form-check-input me-1" type="checkbox" value="${y}" checked> ${y}</label></li>`
       )
       .join('');
     yearList.addEventListener('change', applyFilters);
@@ -193,7 +193,7 @@ async function init() {
     zoneList.innerHTML = zones
       .map(
         z =>
-          `<li class="list-group-item"><label><input type="checkbox" value="${z}" checked> ${z}</label></li>`
+          `<li class="list-group-item"><label><input class="form-check-input me-1" type="checkbox" value="${z}" checked> ${z}</label></li>`
       )
       .join('');
     zoneList.addEventListener('change', applyFilters);
