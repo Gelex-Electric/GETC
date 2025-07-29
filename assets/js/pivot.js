@@ -9,6 +9,7 @@ style.textContent = `
   .child-paid { background-color: #e8f5e9; }
   .child-unpaid { background-color: #ffebee; }
   .checkmark { color: green; font-size: 1.2em; text-align: center; }
+  .summary-row { font-weight: bold; background-color: #f0f0f0; }
 `;
 document.head.appendChild(style);
 
@@ -140,6 +141,23 @@ document.addEventListener('DOMContentLoaded', async () => {
           tbody.appendChild(trC);
         });
       });
+
+      const totals = addrData.reduce((acc, r) => {
+        acc.amount += r.amount;
+        acc.active += r.active;
+        acc.reactive += r.reactive;
+        return acc;
+      }, { amount: 0, active: 0, reactive: 0 });
+
+      const trTotal = document.createElement('tr');
+      trTotal.classList.add('summary-row');
+      trTotal.innerHTML = `
+        <td colspan="3" class="text-end">Tổng</td>
+        <td>${formatNumber(totals.amount)}</td>
+        <td>${formatNumber(totals.active)}</td>
+        <td>${formatNumber(totals.reactive)}</td>
+      `;
+      tbody.appendChild(trTotal);
 
       table.appendChild(tbody);
       container.appendChild(table);
