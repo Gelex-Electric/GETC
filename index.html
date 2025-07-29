@@ -86,7 +86,7 @@
       </a>
     </header>
       <section class="section">
-        <div class="row mb-4">
+      <div class="row mb-4">
         <div class="col-md-6 mb-3 mb-md-0">
           <div class="card text-center">
             <div class="card-body">
@@ -106,39 +106,34 @@
       </div>
       <div class="row">
         <div class="col-md-10">
-          <div class="card h-100">
+          <div class="card">
             <div class="card-body">
               <h4>Biểu đồ phụ tải năm </h4>
               <canvas id="myChart" width="388" height="150" style="display: block; box-sizing: border-box; height: 150px; width: 388px;"></canvas>
             </div>
           </div>
-        </div>
-        <div class="col-md-2 mt-2 mt-md-0">
-          <div class="card h-100">
-            <div class="card-body p-2">
-              <div class="card-content">
-                <h6 class="card-title p-3">Năm</h6>
-                <ul id="yearList" class="list-group list-group-flush overflow-auto" style="max-height:300px;"></ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row mt-4">
-        <div class="col-md-10">
-          <div class="card h-100">
+          <div class="card">
             <div class="card-body">
               <h4>Biểu đồ sản lượng theo KCN</h4>
               <canvas id="stackedChart" width="388" height="150" style="display: block; box-sizing: border-box; height: 150px; width: 388px;"></canvas>
             </div>
-          </div>
+          </div>          
         </div>
         <div class="col-md-2 mt-2 mt-md-0">
-          <div class="card h-100">
+          <div class="card">
+            <div class="card-body p-2">
+              <div class="card-content">
+                <h6 class="card-title p-3">Năm</h6>
+                <ul class="list-group" id="yearList""></ul>
+              </div>
+            </div>
+          </div>
+          <div class="card">
             <div class="card-body p-2">
               <div class="card-content">
                 <h6 class="card-title p-3">Khu công nghiệp</h6>
-                <ul id="zoneList" class="list-group list-group-flush overflow-auto" style="max-height:300px;"></ul>
+                <ul class="list-group" id="zoneList">
+                </ul>
               </div>
             </div>
           </div>
