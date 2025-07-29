@@ -21,8 +21,6 @@ function renderMainChart(filtered, yearFilter) {
   const ctx = document.getElementById('myChart').getContext('2d');
   if (chart1) {
     chart1.destroy();
-    ctx.canvas.style.width = '100%';
-    ctx.canvas.style.height = '400px';
   }
   const yearsToShow = yearFilter === 'all' ? years : [parseInt(yearFilter, 10)];
   const monthly = {};
@@ -82,8 +80,6 @@ function renderStacked(filtered, zoneFilter) {
   const ctx = document.getElementById('stackedChart').getContext('2d');
   if (chart2) {
     chart2.destroy();
-    ctx.canvas.style.width = '100%';
-    ctx.canvas.style.height = '400px';
   }
   const latest = filtered.reduce((m, r) => (r.date > m ? r.date : m), new Date(0));
   const labels = [];
