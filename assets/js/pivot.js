@@ -1,4 +1,5 @@
 import { loadCSV } from './csvReader.js';
+import { formatNumber } from './format.js';
 
 // Dynamic CSS for conditional coloring and checkmark
 const style = document.createElement('style');
@@ -8,6 +9,7 @@ style.textContent = `
   .child-paid { background-color: #e8f5e9; }
   .child-unpaid { background-color: #ffebee; }
   .checkmark { color: green; font-size: 1.2em; text-align: center; }
+  .summary-row { font-weight: bold; background-color: #f0f0f0; }
 `;
 document.head.appendChild(style);
 
@@ -24,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cd = parseDDMMYYYY(r['Ngày chốt chỉ số']);
     return {
       name: r['Tên khách hàng'],
-      address: r['Địa chỉ sử dụng điện'],
+      address: r['Địa chỉ'],
       period: r['Kỳ'],
       paymentDate: pd,
       closingDate: cd,
@@ -47,11 +49,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const containerIds = ['pivotContainer1', 'pivotContainer2', 'pivotContainer3', 'pivotContainer4', 'pivotContainer5'];
   const addresses = [
-    'KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình',
-    'KCN Phong Điền- Viglacera, Thành phố Huế',
-    'KCN Số 3, huyện Ân Thi, Tỉnh Hưng Yên',
-    'KCN Yên Mỹ, huyện Yên Mỹ, Tỉnh Hưng Yên',
-    'KCN Thuận Thành I, Tỉnh Bắc Ninh'
+    'KCNTH',
+    'KCNPĐ',
+    'KCN03',
+    'KCNYM',
+    'KCNTTI'
   ];
 
   function renderPivot() {
@@ -110,9 +112,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td><button class="toggle-btn" data-key="${idx}_${gIdx}">+</button></td>
           <td>${name}</td>
           ${mark}
-          <td>${grp.totals.amount.toLocaleString()}</td>
-          <td>${grp.totals.active.toLocaleString()}</td>
-          <td>${grp.totals.reactive.toLocaleString()}</td>
+          <td>${formatNumber(grp.totals.amount)}</td>
+          <td>${formatNumber(grp.totals.active)}</td>
+          <td>${formatNumber(grp.totals.reactive)}</td>
         `;
         tbody.appendChild(trP);
 
@@ -132,13 +134,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td></td>
             <td>${periodText}</td>
             <td>${pdStr}</td>
-            <td>${it.amount.toLocaleString()}</td>
-            <td>${it.active.toLocaleString()}</td>
-            <td>${it.reactive.toLocaleString()}</td>
+            <td>${formatNumber(it.amount)}</td>
+            <td>${formatNumber(it.active)}</td>
+            <td>${formatNumber(it.reactive)}</td>
           `;
           tbody.appendChild(trC);
         });
       });
+
+      const totals = addrData.reduce((acc, r) => {
+        acc.amount += r.amount;
+        acc.active += r.active;
+        acc.reactive += r.reactive;
+        return acc;
+      }, { amount: 0, active: 0, reactive: 0 });
+
+      const trTotal = document.createElement('tr');
+      trTotal.classList.add('summary-row');
+      trTotal.innerHTML = `
+        <td colspan="3" class="text-end">Tổng</td>
+        <td>${formatNumber(totals.amount)}</td>
+        <td>${formatNumber(totals.active)}</td>
+        <td>${formatNumber(totals.reactive)}</td>
+      `;
+      tbody.appendChild(trTotal);
 
       table.appendChild(tbody);
       container.appendChild(table);
