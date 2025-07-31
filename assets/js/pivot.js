@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cd = parseDDMMYYYY(r['Ngày chốt chỉ số']);
     return {
       name: r['Tên khách hàng'],
-      address: r['Địa chỉ sử dụng điện'],
+      address: r['Địa chỉ'],
       period: r['Kỳ'],
       paymentDate: pd,
       closingDate: cd,
@@ -49,11 +49,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const containerIds = ['pivotContainer1', 'pivotContainer2', 'pivotContainer3', 'pivotContainer4', 'pivotContainer5'];
   const addresses = [
-    'KCN Tiền Hải, huyện Tiền Hải, Tỉnh Thái Bình',
-    'KCN Phong Điền- Viglacera, Thành phố Huế',
-    'KCN Số 3, huyện Ân Thi, Tỉnh Hưng Yên',
-    'KCN Yên Mỹ, huyện Yên Mỹ, Tỉnh Hưng Yên',
-    'KCN Thuận Thành I, Tỉnh Bắc Ninh'
+    'KCNTH',
+    'KCNPĐ',
+    'KCN03',
+    'KCNYM',
+    'KCNTTI'
   ];
 
   function renderPivot() {
