@@ -172,7 +172,7 @@ async function init() {
     const date = new Date(y, m - 1, d);
     const value = parseFloat(row['Sản lượng'].replace(/\./g, '')) || 0;
     const cost = parseFloat(row['Doanh thu'].replace(/\./g, '')) || 0;
-    const match = row['Địa chỉ sử dụng điện'].match(/KCN[^,]*/);
+    const match = row['Địa chỉ: Địa chỉ KCN'].match(/KCN[^,]*/);
     const zone = match ? match[0].trim() : 'Khác';
     return { date, value, cost, zone };
   });
