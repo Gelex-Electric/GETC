@@ -1,0 +1,33 @@
+name: Sync CSV to shared-diary-pocketbase
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'assets/data/datahdKH.csv'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout GETC
+        uses: actions/checkout@v4
+
+      - name: Clone shared-diary-pocketbase
+        run: |
+          git clone https://x-access-token:${{ secrets.REPO_B_PAT }}@github.com/Gelex-Electric/shared-diary-pocketbase.git repo-b
+
+      - name: Copy CSV
+        run: |
+          cp assets/data/datahdKH.csv repo-b/src/datahdKH.csv
+
+      - name: Commit and push
+        run: |
+          cd repo-b
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --staged --quiet || git commit -m "chore: sync datahdKH.csv from GETC"
+          git push
