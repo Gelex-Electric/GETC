@@ -21,7 +21,7 @@ jobs:
 
       - name: Copy CSV
         run: |
-          cp assets/data/datahdKH.csv repo-b/src/datahdKH.csv
+          cp assets/data/datahdKH.csv repo-b/public/datahdKH.csv
 
       - name: Commit and push
         run: |
